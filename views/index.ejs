@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Flagify</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+        <link href="/css/slick.css" rel="stylesheet" type="text/css"/>
+        <link href="/css/slick-theme.css" rel="stylesheet" type="text/css"/>
+        <link href="/css/cropper.min.css" rel="stylesheet" type="text/css"/>
+        <link href="/css/select2.min.css" rel="stylesheet" type="text/css"/>
+
+        <script src="/socket.io/socket.io.js"></script>
+
+    </head>
+    <body>
+
+        <header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a href="/" class="navbar-brand">Flagify</a>
+                </div>
+                <nav id="bs-navbar" class="collapse navbar-collapse">
+
+                </nav>
+            </div>
+        </header>
+        <form id="form" enctype="multipart/form-data" name = "form" id="form" method="POST" action="/api/v1/process">
+
+            <!-- Page Content -->
+            <div class="container">
+                <div class ="row">
+                    <div class ="col-md-4">
+                        <div class ="panel panel-default">
+                            <div class ="panel-heading">
+                                Upload your photo
+                            </div>
+                            <div class="panel-body" id="user-photo">
+                                <div style="height: 40px">
+                                    <p>Drag a file or <a id="upload-link">Click Here</a> to upload</p>
+                                    <input type ="hidden" name="cropX" />
+                                    <input type ="hidden" name="cropY" />
+                                    <input type ="hidden" name="sizeX" />
+                                    <input type ="hidden" name="sizeY" />
+                                </div>
+
+                                <div id="drop-zone" class ="upload-drop-zone">
+                                    <img id = "user-image" width=300 height=300 class ="img" src="http://weblees.com/image/300x300"> 
+                                </div>
+                                <p class ="error" style ="color:red; visibility:hidden">You must upload an image</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class ="col-md-4">
+                        <div class ="panel panel-default">
+                            <div class="panel-heading">
+                                Select a country
+                            </div>
+                            <div class ="panel-body" id="select-country">
+
+                                <div style="height: 40px">
+
+                                    <select class ="form-control" id ="country" name = "country">
+                                        <option>-Select-</option>
+                                        <% for(k in countries) {%>
+
+                                        <option value = "img/flags/orig/<%=k%>.png" data-image-src ="img/flags/orig/<%=k%>.png"><%=countries[k]%></option>
+                                        <% }%>
+
+
+                                    </select>
+                                </div>
+
+                                <img id = "country-image" width=300 height=300  class ="img img-responsive" src="http://weblees.com/image/300x300" />
+
+                                <p class ="error" style ="color:red; visibility:hidden">You must select a country</p>    
+                            </div>
+                        </div>
+                    </div>
+                    <div class ="col-md-4">
+                        <div class ="panel panel-default">
+                            <div class="panel-heading">
+                                Get Flagified
+                            </div> 
+                            <div class ="panel-body" id="get-flagified"> 
+                                <div style="height: 40px"> 
+                                    <div class ="btn-group"> 
+                                        <button class = "btn btn-danger" type ="button" id ="reset">Start Over</button> 
+                                        <button class = "btn btn-success" type ="submit" id ="download">Download</button> 
+                                    </div>
+                                </div> 
+                                <img class ="img" width=300 height=300 id="preview-image" src="http://weblees.com/image/300x300" />
+                                <p class ="error" style ="color:red; visibility:hidden">Error processing image</p>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <div class ="col-md-8 col-md-offset-2">
+                        <div class ="panel panel-default">
+                            <div class ="panel-body">
+                                <h4>The last 5 flagifiers</h4>
+
+                                <div class="slider multiple-items">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <div class ="container">
+                    <div class ="row">
+                        <div class ="col-md-3">
+                            <div class ="pull-left"><span>&copy; 2015 All Rights Reserved</span></div>
+                        </div>
+                        <div class ="col-md-6">
+                            <div class ="text-center"><a href="#privacy-modal" data-toggle="modal">Privacy Policy</a> and <a href="#terms-modal" data-toggle="modal">Terms Of Use</a></div>
+                        </div>
+                        <div class ="col-md-3">
+                            <div class ="pull-right">Awesomeness by <a href="http://www.germanedesign.com.au" target="_blank">Germane Design</a></div>
+                        </div>
+                    </div>
+                </div>
+            </footer> 
+            <div id ="image-modal" class="modal fade">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close close-modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Crop your profile image</h4>
+                        </div>
+                        <div class ="modal-body">
+                            <div class ="image-container" style="height:500px; width:500px">
+                                <img class ="img-responsive img" id="user-image-preview" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default close-modal" >Close</button>
+                            <button id="choose-image" type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class ="modal modal-fade" id="privacy-modal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close close-modal"  aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Privacy Policy</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class ="modal modal-fade" id="terms-modal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Terms and Conditions</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <input style="display:none" id="image" name="userImage" type = "file" />
+        <script src="/js/jquery.min.js" type="text/javascript"></script>
+        <script src="/js/jquery.form.js" type="text/javascript"></script>
+        <script src="/js/jquery.validate.min.js" type="text/javascript"></script>
+        <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="/js/slick.js" type="text/javascript"></script>
+        <script src="/js/select2.min.js" type="text/javascript"></script>
+        <script src="/js/cropper.min.js" type="text/javascript"></script>
+        <script src="/js/select2.full.min.js" type="text/javascript"></script>
+        <script>
+            (function ($, io) {
+                var socket = io();
+
+                socket.on('new-image', function (data) {
+                    var img = '<div style="padding:10px"><img class ="img img-responsive" width=300 height=300 src ="' + data + '" /></div>'
+                    slick = $('.slider').slick('slickAdd', $(img), true);
+
+                });
+                $(document).ready(function () {
+
+                    $.getJSON('/api/v1/last-five-images', function (data) {
+                        $.each(data, function (i, src) {
+                            var img = '<div style="padding:10px"><img class ="img img-responsive" width=300 height=300 src ="' + src + '" /></div>'
+
+                            $('.slider').append($(img));
+
+                        });
+                        $('.multiple-items').slick({
+                            infinite: true,
+                            slidesToShow: 5,
+                            slidesToScroll: 5
+                        });
+                    });
+                    $('a#upload-link').on('click', function () {
+                        $('#image').trigger('click');
+                    })
+
+                });
+            })(jQuery, io);
+
+
+        </script>
+        <script>
+            //polyfill for slide function
+            (function () {
+                if (!File.prototype.slice) {
+                    var newSlice = File.prototype.mozSlice || File.prototype.webkitSlice;
+                    if (newSlice) {
+                        File.prototype.slice = (function () {
+                            return function (startingByte, length) {
+                                return newSlice.call(this, startingByte, length + startingByte);
+                            };
+                        })();
+                    } else {
+                        throw "File.slice() not supported."
+                    }
+                }
+            })();
+
+        </script>
+        <script>
+            ;
+            (function ($) {
+                var file = document.getElementById('image');
+                var country = document.getElementById('country');
+                var btnDownload = document.getElementById('download');
+                var btnReset = document.getElementById('reset');
+                var drop = document.getElementById('drop-zone');
+                var userImgSrc;
+                var countryImgSrc;
+                var userImageFile;
+                function cancel(e) {
+                    if (e.preventDefault) {
+                        e.preventDefault();
+                    }
+                    return false;
+                }
+                
+                function validateMime(mime) {
+                    var mimes = ['image/png', 'image/jpeg', 'image/gif'];
+                    if (mimes.indexOf(mime) >= 0){
+                        return true;
+                    }else{
+                        $('#user-photo').css('border', '1px solid red');
+                        $('#user-photo p.error').css('visibility', 'visible');
+                        return false;
+                    }
+                }
+                function validateForm() {
+                    var photoValid = false;
+                    var countryValid = false;
+                    if (!userImageFile) {
+                        $('#user-photo').css('border', '1px solid red');
+                        $('#user-photo p.error').css('visibility', 'visible');
+
+                    } else {
+                        $('#user-photo').css('border', 'none');
+                        $('#user-photo p.error').css('visibility', 'hidden');
+                        photoValid = true;
+                    }
+                   
+                    if ($('#country').val() === '-Select-') {
+                        $('#select-country').css('border', '1px solid red');
+                        $('#select-country p.error').css('visibility', 'visible');
+                    } else {
+                        $('#select-country').css('border', 'none');
+                        $('#select-country p.error').css('visibility', 'hidden');
+                        countryValid = true;
+                    }
+                    return photoValid && countryValid;
+                }
+                function renderUserImage(src) {
+                    console.log(src);
+                    var img = document.getElementById('user-image-preview');
+
+                    img.src = src;
+                    //if the ratio needs to be adjusted
+                    $('#user-image-preview').cropper({
+                        aspectRatio: 1 / 1,
+                        crop: function (e) {
+                            // Output the result data for cropping image.
+                            $('[name=cropX]').val(e.x);
+                            $('[name=cropY]').val(e.y);
+                            $('[name=sizeX]').val(e.width);
+                            $('[name=sizeY]').val(e.height);
+                        }
+                    });
+                    $('#image-modal').on('hide.bs.modal', function (e) {
+                        $('#user-image-preview').cropper('destroy');
+                        console.log($(e.relatedTarget))
+                    }).modal('show');
+
+                }
+
+                function renderPreviewImage(countryImgSrc, userImgSrc) {
+                    var canvasPreview = document.createElement('canvas');
+                    canvasPreview.width = 300;
+                    canvasPreview.height = 300;
+                    var contextPreview = canvasPreview.getContext("2d");
+                    contextPreview.globalCompositeOperation = "overlay";
+                    contextPreview.clearRect(0, 0, canvasPreview.width, canvasPreview.height);
+
+                    var myImage = new Image();
+                    var myImage2 = new Image();
+
+
+                    myImage.setAttribute('crossOrigin', 'anonymous');
+                    myImage2.setAttribute('crossOrigin', 'anonymous');
+                    myImage.src = userImgSrc;
+                    myImage2.onload = function () {
+                        contextPreview.drawImage(myImage2, 0, 0, canvasPreview.width, canvasPreview.height);
+                        $('#preview-image').attr('src', canvasPreview.toDataURL());
+                    };
+                    myImage.onload = function () {
+
+                        contextPreview.drawImage(myImage, 0, 0, canvasPreview.width, canvasPreview.height);
+                        myImage2.src = countryImgSrc;
+                    };
+
+                }
+                function handleImage(e) {
+
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+
+                        var mime = reader.result.split(',')[0].split(':')[1].split(';')[0];
+                        
+                        if(validateMime(mime)){
+                             renderUserImage(reader.result);
+                        }
+                    }
+                    reader.readAsDataURL(document.getElementById('image').files[0]);
+                    userImageFile = document.getElementById('image').files[0];
+                   
+
+                }
+                function handleCountry(e) {
+
+                    var elt = e.target;
+                    if (elt.selectedIndex == -1) {
+                        return;
+                    }
+
+                    countryImgSrc = elt.options[elt.selectedIndex].dataset.imageSrc;
+                    $('#country-image').attr('src', countryImgSrc);
+
+                    if (countryImgSrc && userImgSrc) {
+                        renderPreviewImage(countryImgSrc, userImgSrc);
+                    }
+
+                }
+                $('.close-modal').on('click',function(e){
+                    $(this).closest('.modal').modal('hide');
+                    userImageFile = null;
+                })
+                $('#choose-image').on('click', function (e) {
+                    var canvas = $('#user-image-preview').cropper('getCroppedCanvas', {
+                        width: 300,
+                        height: 300,
+                    });
+                    var src = canvas.toDataURL();
+                    $('#user-image').attr('src', src);
+                    userImgSrc = src;
+                    $('#image-modal').modal('hide');
+                    if (countryImgSrc && userImgSrc) {
+                        renderPreviewImage(countryImgSrc, userImgSrc);
+                    }
+
+                });
+                $('form').on('submit', function (e) {
+                    e.preventDefault();
+
+
+                    if (!validateForm()) {
+                        return false;
+                    }
+                    var formData = new FormData(document.getElementById('form'));
+                    formData.append('userImage', userImageFile);
+
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        processData: false, // tell jQuery not to process the data
+                        contentType: false, // tell jQuery not to set contentType
+                        success: function (response, status, xhr) {
+
+                            a = document.createElement('a');
+                            a.href = response.data;
+                            a.download = 'flagify.png'
+                            document.body.appendChild(a);
+                            a.click();
+
+                        }
+                    });
+
+                });
+
+
+                
+                $('#country').select2().on('change', handleCountry);
+
+                $('#image').on('change', function (e) {
+                    e.preventDefault();
+                    handleImage(e)
+                });
+                
+                country.addEventListener('change', handleCountry, false);
+                drop.addEventListener('dragover', cancel);
+                drop.addEventListener('dragenter', cancel);
+                drop.addEventListener('drop', function (e) {
+                    e = e || window.event; // get window.event if e argument missing (in IE)   
+                    if (e.preventDefault) {
+                        e.preventDefault();
+                    } // stops the browser from redirecting off to the image.
+
+                    var dt = e.dataTransfer;
+                    var files = dt.files;
+
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        var mime = reader.result.split(',')[0].split(':')[1].split(';')[0];
+                        
+                        if(validateMime(mime)){
+                             renderUserImage(reader.result);
+                        }
+                       
+
+                    }
+                    reader.readAsDataURL(files[0]);
+                    userImageFile = files[0];
+                    
+                });
+                btnReset.addEventListener('click', function (e) {
+
+
+                    userImgSrc = '';
+                    countryImgSrc = '';
+                    document.getElementById('user-image').src = 'http://weblees.com/image/300x300'
+                    document.getElementById('country-image').src = 'http://weblees.com/image/300x300'
+                    document.getElementById('preview-image').src = 'http://weblees.com/image/300x300'
+                    $('#country').select2('val', '-Select-');
+                }, false);
+
+            })(jQuery);
+        </script>
+    </body>
+</html>
