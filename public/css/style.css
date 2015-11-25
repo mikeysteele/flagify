@@ -1,19 +1,65 @@
 /* layout.css Style */
 .upload-drop-zone {
-  height: 300px;
-  border-width: 2px;
-  
+    height: 254px;
+    border-width: 2px;
+
 }
 
 /* skin.css Style*/
 .upload-drop-zone {
-  color: #ccc;
-  border-style: dashed;
-  border-color: #ccc;
-  line-height: 200px;
-  text-align: center
+    color: #ccc;
+    border-style: dashed;
+    border-color: #ccc;
+    line-height: 200px;
+    text-align: center
 }
 .upload-drop-zone.drop {
-  color: #222;
-  border-color: #222;
+    color: #222;
+    border-color: #222;
+}
+p.error {
+    color:red; 
+    visibility:hidden
+}
+
+.img-small {
+    width:250px;
+    height:250px;
+}
+
+ #user-image{
+        width: 246px;
+        height: 246px;
+    }
+@media (min-width: 786px) { 
+    .img-small {
+        width:300px;
+        height:300px;
+    } 
+    .upload-drop-zone {
+        height: 300px;
+        border-width: 2px;
+
+    }
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { 
+    .img-small {
+        width:300px;
+        height:300px;
+    }
+    #user-image{
+        width: 296px;
+        height: 296px;
+    }
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { 
+
+    .img-small {
+        width:300px;
+        height:300px;
+    }
 }

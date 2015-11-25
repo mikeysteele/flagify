@@ -8,7 +8,7 @@ var redisClient = require('../application/services/redisClient.js');
 var io = require('../application/services/socketio.js');
 var fs = require('fs');
 console.log(ImageMerger);
-var imageMerger = new ImageMerger('overlay');
+var imageMerger = new ImageMerger('soft-light');
 /* GET home page. */
 router.get('/last-five-images', function (req, res) {
     redisClient.getClient().lrange('images', 0, -1, function (err, data) {

@@ -34,20 +34,20 @@ merger.prototype.merge = function (image1, image2, options, cb) {
             
 
             var canvas = new Canvas(options.width, options.height);
-            var canvas2 = new Canvas(300, (300 * ratio));
+            var canvas2 = new Canvas(200, (200 * ratio));
             var ctx = canvas.getContext('2d');
             var ctx2 = canvas2.getContext('2d');
             ctx2.globalCompositeOperation = mode;
             ctx.globalCompositeOperation = mode;
             img.onload = function () {
                 ctx.drawImage(img, options.left, options.top, options.width, options.height, 0, 0, options.width, options.height);
-                ctx2.drawImage(img, options.left, options.top, options.width, options.height, 0, 0, 300, (300 * ratio));
+                ctx2.drawImage(img, options.left, options.top, options.width, options.height, 0, 0, 200, (200 * ratio));
                 img2.src = file2;
             }
             img2.onload = function () {
                 ctx.drawImage(img2, 0, 0, options.width, options.height);
 
-                ctx2.drawImage(img2, 0, 0, 300, (300 * ratio));
+                ctx2.drawImage(img2, 0, 0, 200, (200 * ratio));
                 cb(canvas, canvas2);
             }
             img.src = file1;

@@ -11,9 +11,9 @@ function redisClient(){
 
 redisClient.prototype.add = function(data){
     var redis = this.redis;
-    redis.lpush('images', data,function(){
-        redis.ltrim('images', 0, 4);
-    })
+    redis.ltrim('images', 0,3, function(){
+        redis.lpush('images',data);
+    });
     
    
 };
