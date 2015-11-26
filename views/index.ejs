@@ -14,7 +14,7 @@
 
     </head>
     <body>
-
+   
         <header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
             <div class="container">
                 <div class="navbar-header">
@@ -111,7 +111,7 @@
                             <div class ="panel-body">
                                 <h4>The last 5 flagifiers</h4>
 
-                                <div class="slider multiple-items">
+                                <div dir="rtl" class="slider multiple-items">
 
                                 </div>
                             </div>
@@ -130,6 +130,7 @@
                             <div class ="text-center"><a href="#privacy-modal" data-toggle="modal">Privacy Policy</a> and <a href="#terms-modal" data-toggle="modal">Terms Of Use</a></div>
                         </div>
                         <div class ="col-md-3">
+                            
                             <div class ="pull-right">Awesomeness by <a href="http://www.germanedesign.com.au" target="_blank">Germane Design</a></div>
                         </div>
                     </div>
@@ -219,27 +220,25 @@
                 var socket = io();
 
                 socket.on('new-image', function (data) {
-                   console.log(data);
+                    console.log(data);
                     var img = '<div style="padding:10px"><img class ="img img-responsive" width=300 height=300 src ="' + data + '" /></div>'
-                    
-                $('.slider').slick('slickAdd', $(img), true).slick('slickRemove', $('.slick-slide').length - 1);
+
+                    $('.slider').slick('slickAdd', $(img), false).slick('slickNext')
 
                 });
                 $(document).ready(function () {
-
+                    
                     $.getJSON('/api/v1/last-five-images', function (data) {
                         $.each(data, function (i, src) {
                             var img = '<div style="padding:10px"><img class ="img img-responsive" width=300 height=300 src ="' + src + '" /></div>'
 
-                            $('.slider').append($(img));
+                            $('.slider').prepend($(img));
 
                         });
                         $('.multiple-items').slick({
-                            
+                            rtl: true,
                             slidesToShow: 5,
                             slidesToScroll: 1,
-                            
-                            
                         });
                     });
                     $('a#upload-link').on('click', function () {
@@ -272,7 +271,7 @@
         <script>
             ;
             (function ($) {
-               
+
                 var country = document.getElementById('country');
                 var btnReset = document.getElementById('reset');
                 var drop = document.getElementById('drop-zone');
@@ -285,12 +284,12 @@
                     }
                     return false;
                 }
-                
+
                 function validateMime(mime) {
                     var mimes = ['image/png', 'image/jpeg', 'image/gif'];
-                    if (mimes.indexOf(mime) >= 0){
+                    if (mimes.indexOf(mime) >= 0) {
                         return true;
-                    }else{
+                    } else {
                         $('#user-photo').css('border', '1px solid red');
                         $('#user-photo p.error').css('visibility', 'visible');
                         return false;
@@ -308,7 +307,7 @@
                         $('#user-photo p.error').css('visibility', 'hidden');
                         photoValid = true;
                     }
-                   
+
                     if ($('#country').val() === '-Select-') {
                         $('#select-country').css('border', '1px solid red');
                         $('#select-country p.error').css('visibility', 'visible');
@@ -320,8 +319,8 @@
                     return photoValid && countryValid;
                 }
                 function renderUserImage(src) {
-                   var img = document.getElementById('user-image-preview');
-                   img.src = src;
+                    var img = document.getElementById('user-image-preview');
+                    img.src = src;
                     //if the ratio needs to be adjusted
                     $('#user-image-preview').cropper({
                         aspectRatio: 1 / 1,
@@ -334,7 +333,7 @@
                         }
                     });
                     $('#image-modal').on('hide.bs.modal', function (e) {
-                        $('#user-image-preview').cropper('destroy');                       
+                        $('#user-image-preview').cropper('destroy');
                     }).modal('show');
                 }
 
@@ -370,10 +369,10 @@
                 function handleImage(e) {
                     var reader = new FileReader();
                     reader.onloadend = function () {
-                    var mime = reader.result.split(',')[0].split(':')[1].split(';')[0];
-                        
-                        if(validateMime(mime)){
-                             renderUserImage(reader.result);
+                        var mime = reader.result.split(',')[0].split(':')[1].split(';')[0];
+
+                        if (validateMime(mime)) {
+                            renderUserImage(reader.result);
                         }
                     }
                     reader.readAsDataURL(document.getElementById('image').files[0]);
@@ -394,7 +393,7 @@
                     }
 
                 }
-                $('.close-modal').on('click',function(e){
+                $('.close-modal').on('click', function (e) {
                     $(this).closest('.modal').modal('hide');
                     userImageFile = null;
                 });
@@ -445,14 +444,14 @@
                 });
 
 
-                
+
                 $('#country').select2().on('change', handleCountry);
 
                 $('#image').on('change', function (e) {
                     e.preventDefault();
                     handleImage(e)
                 });
-                
+
                 country.addEventListener('change', handleCountry, false);
                 drop.addEventListener('dragover', cancel);
                 drop.addEventListener('dragenter', cancel);
@@ -468,16 +467,16 @@
                     var reader = new FileReader();
                     reader.onloadend = function () {
                         var mime = reader.result.split(',')[0].split(':')[1].split(';')[0];
-                        
-                        if(validateMime(mime)){
-                             renderUserImage(reader.result);
+
+                        if (validateMime(mime)) {
+                            renderUserImage(reader.result);
                         }
-                       
+
 
                     }
                     reader.readAsDataURL(files[0]);
                     userImageFile = files[0];
-                    
+
                 });
                 btnReset.addEventListener('click', function (e) {
 
