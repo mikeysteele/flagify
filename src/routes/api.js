@@ -5,7 +5,7 @@ var multer = require('multer')
 var upload = multer({dest: 'tmp/'})
 var ImageMerger = require('../modules/image-merger/');
 var redisClient = require('../application/services/redisClient.js');
-var io = require('../application/services/socketio.js');
+var io = require('socket.io-emitter')({ host: '127.0.0.1', port: 6379 });
 var fs = require('fs');
 console.log(ImageMerger);
 var imageMerger = new ImageMerger('soft-light');
@@ -52,7 +52,7 @@ router.post('/process', upload.single('userImage'), function (req, res, next) {
         }
         canvas2.toDataURL(function (err, data) {
             redisClient.add(data);
-            io.getClient().emit('new-image', data);
+            io.to('images').emit('new-image', data);
         });
         fs.unlink(prefix + '/' + req.file.path);
 
