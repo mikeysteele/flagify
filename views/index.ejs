@@ -210,6 +210,7 @@
         <script src="/js/jquery.min.js" type="text/javascript"></script>
         <script src="/js/jquery.form.js" type="text/javascript"></script>
         <script src="/js/jquery.validate.min.js" type="text/javascript"></script>
+        <script src="/js/jquery.binarytransport.js" type="text/javascript"></script>
         <script src="/js/bootstrap.min.js" type="text/javascript"></script>
         <script src="/js/slick.js" type="text/javascript"></script>
         <script src="/js/select2.min.js" type="text/javascript"></script>
@@ -428,13 +429,15 @@
                         url: $(this).attr('action'),
                         type: 'POST',
                         data: formData,
+                        dataType: 'binary',
                         processData: false, // tell jQuery not to process the data
                         contentType: false, // tell jQuery not to set contentType
                         success: function (response, status, xhr) {
+                            var downloadUrl = URL.createObjectURL(response);
                             $('#download').button('reset');
                             a = document.createElement('a');
-                            a.href = response.data;
-                            a.download = 'flagify.png'
+                            a.href = downloadUrl;
+                            a.download = 'flagify.jpg'
                             document.body.appendChild(a);
                             a.click();
 

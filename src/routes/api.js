@@ -29,7 +29,7 @@ router.post('/process', upload.single('userImage'), function (req, res, next) {
         height: parseInt(req.body.sizeY)
     };
     imageMerger.merge(prefix + '/' + req.file.path, prefix + '/public/' + req.body.country, options, function (canvas, canvas2) {
-        if (!req.xhr) {
+        
             res.writeHead(200, {
                 'Content-Type': 'image/jpeg',
                 'Access-Control-Allow-Origin': '*',
@@ -43,13 +43,7 @@ router.post('/process', upload.single('userImage'), function (req, res, next) {
             });
 
             stream.pipe(res);
-        }
-        else {
-            canvas.toDataURL(function (err, data) {
-                res.json({data: data})
-            })
-
-        }
+        
         canvas2.toDataURL(function (err, data) {
             redisClient.add(data);
             io.to('images').emit('new-image', data);
